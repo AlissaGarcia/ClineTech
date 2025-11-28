@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmileLab - Sistema</title>
+
+<link rel="icon" type="image/png" href="assets/Logo-colorida-sombreada-sem-fundo.png">
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Arial", sans-serif;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+    }
+
+    /* ========================== */
+    /* TELA INICIAL               */
+    /* ========================== */
+    #telaInicial {
+        background: url('assets/Página-Inicial-SmileLab.png') no-repeat center center;
+        background-size: cover;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        padding: 40px;
+    }
+
+    #btnEntrar {
+        padding: 12px 40px;
+        font-size: 35px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #9fc5f0, #1E6BD6);
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        position: absolute;
+        right: 340px;
+        bottom: 150px;
+    }
+
+    #btnEntrar:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.30);
+    }
+
+    /* ========================== */
+    /* TELA LOGIN                 */
+    /* ========================== */
+    #telaLogin {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: url('assets/Página-Login-SmileLab.png') no-repeat center center;
+    background-size: cover;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+
+    .login-box {
+        width: 380px;
+        background: white;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0px 10px 35px rgba(0,0,0,0.25);
+        margin-right: 100px;
+    }
+
+    .login-box h1 {
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #003366;
+        font-size: 28px;
+        text-align: center;
+    }
+
+    label {
+        font-weight: bold;
+        color: #003366;
+        font-size: 15px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 6px;
+        margin-bottom: 18px;
+        border: 1px solid #88a8c8;
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
+    #btnLogin {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background: linear-gradient(135deg, #7ab4ff, #1E6BD6);
+        color: white;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0px 6px 18px rgba(0,0,0,0.20);
+    }
+
+    #btnLogin:hover {
+        transform: translateY(-3px);
+        box-shadow: 0px 12px 22px rgba(0,0,0,0.25);
+    }
+
+    /* ========================== */
+    /* OUTRAS TELAS               */
+    /* ========================== */
+    #telaDentista, #telaSecretaria, #telaAdmin {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: white;
+    }
+
+/* NAVBAR SUPERIOR */
+.admin-navbar {
+    height: 70px;
+    width: 100%;
+    background: #1E6BD6;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    color: white;
+}
+
+.logoAdmin {
+    height: 50px;
+    margin-right: 15px;
+}
+
+.admin-title {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* SIDEBAR */
+.admin-sidebar {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 250px;
+    height: calc(100% - 70px);
+    background: #e8f1ff;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.side-btn {
+    width: 100%;
+    padding: 18px;
+    text-align: left;
+    font-size: 17px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #003366;
+    transition: 0.2s;
+}
+
+.side-btn:hover {
+    background: #d2e4ff;
+}
+
+/* CONTEÚDO */
+.admin-content {
+    margin-left: 260px;
+    margin-top: 80px;
+    padding: 20px;
+}
+
+/* FORMULÁRIOS */
+.formulario {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+}
+
+.formulario input,
+.formulario textarea {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #88a8c8;
+    border-radius: 10px;
+}
+
+.salvar-btn {
+    padding: 12px;
+    background: #1E6BD6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* RELATÓRIOS */
+.relatorio-btn {
+    padding: 12px 18px;
+    background: #1E6BD6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- ========================== -->
+<!-- TELA INICIAL               -->
+<!-- ========================== -->
+<div id="telaInicial">
+    <button id="btnEntrar">Entrar</button>
+</div>
+
+<!-- ========================== -->
+<!-- TELA LOGIN                 -->
+<!-- ========================== -->
+<div id="telaLogin">
+    <div class="login-box">
+        <h1>Faça seu login aqui</h1>
+
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" placeholder="Digite seu usuário">
+
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="Digite sua senha">
+
+        <button id="btnLogin">Fazer Login</button>
+    </div>
+</div>
+
+<!-- ========================== -->
+<!-- TELAS INTERNAS             -->
+<!-- ========================== -->
+<div id="telaDentista"><h1>Tela do Dentista</h1></div>
+<div id="telaSecretaria"><h1>Tela da Secretária</h1></div>
+<div id="telaAdmin">
+
+    <!-- NAVBAR SUPERIOR -->
+    <div class="admin-navbar">
+        <img src="assets/Logo-branca-sombreada-sem-fundo.png" class="logoAdmin">
+        <span class="admin-title">SmileLab - Área Administrativa</span>
+    </div>
+
+    <!-- SIDEBAR LATERAL -->
+    <div class="admin-sidebar">
+        <button class="side-btn" onclick="abrirAbaAdmin('dashboard')">Dashboard</button>
+        <button class="side-btn" onclick="abrirAbaAdmin('pacientes')">Cadastro de Pacientes</button>
+        <button class="side-btn" onclick="abrirAbaAdmin('dentistas')">Cadastro de Dentistas</button>
+        <button class="side-btn" onclick="abrirAbaAdmin('agendamentos')">Agendamentos</button>
+        <button class="side-btn" onclick="abrirAbaAdmin('financeiro')">Financeiro</button>
+        <button class="side-btn" onclick="abrirAbaAdmin('relatorios')">Relatórios</button>
+    </div>
+
+    <!-- ÁREA DE CONTEÚDO -->
+    <div class="admin-content">
+
+        <!-- DASHBOARD -->
+        <div class="adminPage" id="aba-dashboard">
+            <h1>Bem-vindo ao Painel Administrativo</h1>
+            <p>Selecione uma das opções ao lado para começar.</p>
+        </div>
+
+        <!-- CADASTRO DE PACIENTES -->
+        <div class="adminPage" id="aba-pacientes" style="display:none;">
+            <h1>Cadastro de Pacientes</h1>
+
+            <form class="formulario">
+                <label>Nome:</label>
+                <input type="text">
+
+                <label>Endereço:</label>
+                <input type="text">
+
+                <label>Telefone:</label>
+                <input type="text">
+
+                <label>Data de Nascimento:</label>
+                <input type="date">
+
+                <label>CPF:</label>
+                <input type="text">
+
+                <label>Histórico de Tratamento:</label>
+                <textarea></textarea>
+
+                <label>Alergias:</label>
+                <textarea></textarea>
+
+                <label>Foto 3x4:</label>
+                <input type="file" accept="image/*">
+
+                <label>Radiografias:</label>
+                <input type="file" accept="image/*" multiple>
+
+                <label>Observações:</label>
+                <textarea></textarea>
+
+                <button class="salvar-btn">Salvar Paciente</button>
+            </form>
+        </div>
+
+        <!-- CADASTRO DE DENTISTAS -->
+        <div class="adminPage" id="aba-dentistas" style="display:none;">
+            <h1>Cadastro de Dentistas</h1>
+
+            <form class="formulario">
+                <label>Nome:</label>
+                <input type="text">
+
+                <label>Endereço:</label>
+                <input type="text">
+
+                <label>Telefone:</label>
+                <input type="text">
+
+                <label>Data de Nascimento:</label>
+                <input type="date">
+
+                <label>CPF:</label>
+                <input type="text">
+
+                <label>Especialidade:</label>
+                <input type="text">
+
+                <label>Serviços Ofertados:</label>
+                <textarea></textarea>
+
+                <button class="salvar-btn">Salvar Dentista</button>
+            </form>
+        </div>
+
+        <!-- AGENDAMENTOS -->
+        <div class="adminPage" id="aba-agendamentos" style="display:none;">
+            <h1>Agendamentos</h1>
+
+            <div id="calendario"></div>
+
+            <div id="area-horarios" style="display:none;">
+                <h3>Horários Disponíveis</h3>
+                <div id="lista-horarios"></div>
+            </div>
+        </div>
+
+        <!-- FINANCEIRO -->
+        <div class="adminPage" id="aba-financeiro" style="display:none;">
+            <h1>Financeiro</h1>
+
+            <div class="financeiro-box">
+                <p>Entradas do mês: R$ 0,00</p>
+                <p>Saídas do mês: R$ 0,00</p>
+                <p>Saldo: R$ 0,00</p>
+            </div>
+        </div>
+
+        <!-- RELATÓRIOS -->
+        <div class="adminPage" id="aba-relatorios" style="display:none;">
+            <h1>Relatórios</h1>
+            <button class="relatorio-btn">Gerar Relatório de Pacientes</button>
+            <button class="relatorio-btn">Gerar Relatório de Dentistas</button>
+            <button class="relatorio-btn">Gerar Relatório Financeiro</button>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+/* ---------------------- */
+/* TRANSIÇÃO PARA LOGIN   */
+/* ---------------------- */
+document.getElementById("btnEntrar").addEventListener("click", () => {
+    telaInicial.style.display = "none";
+    telaLogin.style.display = "flex";
+});
+
+/* ---------------------- */
+/* SISTEMA DE LOGIN       */
+/* ---------------------- */
+document.getElementById("btnLogin").addEventListener("click", () => {
+    const usuario = document.getElementById("usuario").value.trim();
+    const senha = document.getElementById("senha").value.trim();
+
+    /* SECRETÁRIA */
+    if (usuario === "Marcia" && senha === "Marcinha1234") {
+        abrirTela("secretaria");
+    }
+    /* DENTISTAS */
+    else if (usuario === "FábioDentista" && senha === "Fabio1234") {
+        abrirTela("dentista");
+    }
+    else if (usuario === "DrCarlos" && senha === "CARLOS") {
+        abrirTela("dentista");
+    }
+    else if (usuario === "JoanaDentista" && senha === "J123") {
+        abrirTela("dentista");
+    }
+    /* ADMIN */
+    else if (usuario === "DrGustavoLarios" && senha === "SmileyLab!1234") {
+        abrirTela("admin");
+    }
+    else {
+        alert("Usuário ou senha incorretos.");
+    }
+});
+
+/* ---------------------- */
+/* FUNÇÃO DE TROCAR TELAS */
+/* ---------------------- */
+function abrirTela(tipo) {
+    telaLogin.style.display = "none";
+
+    if (tipo === "secretaria") telaSecretaria.style.display = "block";
+    if (tipo === "dentista") telaDentista.style.display = "block";
+    if (tipo === "admin") telaAdmin.style.display = "block";
+}
+
+function abrirAbaAdmin(aba) {
+    document.querySelectorAll(".adminPage").forEach(div => {
+        div.style.display = "none";
+    });
+
+    document.getElementById(`aba-${aba}`).style.display = "block";
+}
+
+</script>
+
+</body>
+</html>
