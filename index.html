@@ -531,6 +531,32 @@
     }
 
     /* FINANCEIRO */
+
+    /* Estilos para o módulo financeiro da secretária */
+.status-pendente {
+    color: #f57c00;
+    font-weight: bold;
+}
+
+.status-pago {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.botao-registrar-pagamento {
+    padding: 8px 12px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.botao-registrar-pagamento:hover {
+    background: #1b5e20;
+}
     .caixas-financeiras { 
         display:flex; 
         gap:15px; 
@@ -1050,6 +1076,9 @@
             <button class="btn-sidebar" data-aba="sec-agendamentos">
                 <i>📅</i> Agendamentos
             </button>
+            <button class="btn-sidebar" data-aba="sec-financeiro">
+    <i>💰</i> Financeiro
+</button>
         </div>
 
         <!-- CONTEÚDO PRINCIPAL -->
@@ -1115,6 +1144,38 @@
                     <tbody></tbody>
                 </table>
             </div>
+            <!-- FINANCEIRO -->
+<div class="pagina" id="sec-financeiro">
+    <h1>Financeiro - Registro de Pagamentos</h1>
+    <p class="texto-secundario">Registre os pagamentos dos atendimentos realizados.</p>
+
+    <div class="caixas-financeiras">
+        <div class="cartao-financeiro">
+            <h3>Total Recebido (Mês)</h3>
+            <strong id="totalRecebidoSecretaria" style="font-size: 24px; color: #2e7d32;">R$ 0,00</strong>
+        </div>
+        <div class="cartao-financeiro">
+            <h3>Pagamentos Pendentes</h3>
+            <strong id="pagamentosPendentes" style="font-size: 24px; color: #f57c00;">0</strong>
+        </div>
+    </div>
+
+    <h3>Atendimentos para Pagamento</h3>
+    <table class="tabela" id="tabelaAtendimentosSec">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>Paciente</th>
+                <th>Dentista</th>
+                <th>Especialidade</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
         </div>
     </div>
 </div>
@@ -1225,6 +1286,52 @@
         </div>
 
         <button id="salvarDadosPaciente" class="botao-salvar">Salvar Alterações</button>
+    </div>
+</div>
+<!-- MODAL DE REGISTRO DE PAGAMENTO -->
+<div id="modalPagamento" class="modal">
+    <div class="conteudo-modal">
+        <span class="fechar-modal" onclick="fecharModalPagamento()">&times;</span>
+        
+        <h2>Registrar Pagamento</h2>
+        
+        <div class="grupo-formulario">
+            <p><strong>Paciente:</strong> <span id="pacientePagamento"></span></p>
+            <p><strong>Dentista:</strong> <span id="dentistaPagamento"></span></p>
+            <p><strong>Data do Atendimento:</strong> <span id="dataAtendimentoPagamento"></span></p>
+        </div>
+
+        <div class="linha-formulario">
+            <div class="grupo-formulario">
+                <label for="valorPagamento">Valor (R$)</label>
+                <input type="number" id="valorPagamento" step="0.01" min="0" placeholder="0,00">
+            </div>
+            
+            <div class="grupo-formulario">
+                <label for="formaPagamento">Forma de Pagamento</label>
+                <select id="formaPagamento">
+                    <option value="À vista">À vista</option>
+                    <option value="Parcelado">Parcelado</option>
+                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                    <option value="Cartão de Débito">Cartão de Débito</option>
+                    <option value="PIX">PIX</option>
+                    <option value="Transação Bancária">Transação Bancária</option>
+                    <option value="Convênio">Convênio</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grupo-formulario" id="grupoParcelas" style="display: none;">
+            <label for="parcelasPagamento">Número de Parcelas</label>
+            <input type="number" id="parcelasPagamento" min="2" max="12" value="2">
+        </div>
+
+        <div class="grupo-formulario">
+            <label for="observacaoPagamento">Observações</label>
+            <textarea id="observacaoPagamento" rows="3" placeholder="Observações sobre o pagamento"></textarea>
+        </div>
+
+        <button id="btnRegistrarPagamento" class="botao-salvar">Registrar Pagamento</button>
     </div>
 </div>
 
@@ -1966,6 +2073,8 @@ const ModuloAdmin = {
         });
     },
 
+    
+
     mostrarAba(aba) {
         // Esconder todas as páginas
         Utilitarios.seletores('#telaAdmin .pagina').forEach(pagina => {
@@ -2166,44 +2275,44 @@ const ModuloAdmin = {
         this.renderizarFinanceiro();
     },
 
-    renderizarFinanceiro() {
-        const pagamentos = Utilitarios.armazenamento.obter('sml_pagamentos', []);
-        const entradas = pagamentos.reduce((soma, pagamento) => soma + Number(pagamento.valor), 0);
-        const saidas = 0; // Para simplificar, consideramos apenas entradas
-        const saldo = entradas - saidas;
+renderizarFinanceiro() {
+    const pagamentos = Utilitarios.armazenamento.obter('sml_pagamentos', []);
+    const entradas = pagamentos.reduce((soma, pagamento) => soma + Number(pagamento.valor), 0);
+    const saidas = 0; // Para simplificar, consideramos apenas entradas
+    const saldo = entradas - saidas;
+    
+    // Atualizar valores no dashboard
+    Utilitarios.seletor("#totalEntradas").textContent = Utilitarios.formatarMoeda(entradas);
+    Utilitarios.seletor("#totalSaidas").textContent = Utilitarios.formatarMoeda(saidas);
+    Utilitarios.seletor("#saldoAtual").textContent = Utilitarios.formatarMoeda(saldo);
+    
+    // Atualizar valores na aba de financeiro
+    Utilitarios.seletor("#valorEntradas").textContent = Utilitarios.formatarMoeda(entradas);
+    Utilitarios.seletor("#valorSaidas").textContent = Utilitarios.formatarMoeda(saidas);
+    Utilitarios.seletor("#valorSaldo").textContent = Utilitarios.formatarMoeda(saldo);
+    
+    // Renderizar tabela de pagamentos
+    const tbody = Utilitarios.seletor("#tabelaPagamentos tbody");
+    
+    if (tbody) {
+        tbody.innerHTML = '';
         
-        // Atualizar valores no dashboard
-        Utilitarios.seletor("#totalEntradas").textContent = Utilitarios.formatarMoeda(entradas);
-        Utilitarios.seletor("#totalSaidas").textContent = Utilitarios.formatarMoeda(saidas);
-        Utilitarios.seletor("#saldoAtual").textContent = Utilitarios.formatarMoeda(saldo);
-        
-        // Atualizar valores na aba de financeiro
-        Utilitarios.seletor("#valorEntradas").textContent = Utilitarios.formatarMoeda(entradas);
-        Utilitarios.seletor("#valorSaidas").textContent = Utilitarios.formatarMoeda(saidas);
-        Utilitarios.seletor("#valorSaldo").textContent = Utilitarios.formatarMoeda(saldo);
-        
-        // Renderizar tabela de pagamentos
-        const tbody = Utilitarios.seletor("#tabelaPagamentos tbody");
-        
-        if (tbody) {
-            tbody.innerHTML = '';
-            
-            if (pagamentos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;" class="texto-secundario">Nenhum pagamento registrado.</td></tr>';
-            } else {
-                pagamentos.forEach(pagamento => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${pagamento.paciente}</td>
-                        <td>${Utilitarios.formatarMoeda(pagamento.valor)}</td>
-                        <td>${pagamento.tipo}</td>
-                        <td>${Utilitarios.formatarData(pagamento.data)}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+        if (pagamentos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;" class="texto-secundario">Nenhum pagamento registrado.</td></tr>';
+        } else {
+            pagamentos.forEach(pagamento => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${pagamento.pacienteNome}</td>
+                    <td>${Utilitarios.formatarMoeda(pagamento.valor)}</td>
+                    <td>${pagamento.formaPagamento}${pagamento.parcelas > 1 ? ` (${pagamento.parcelas}x)` : ''}</td>
+                    <td>${Utilitarios.formatarData(pagamento.dataPagamento)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
-    },
+    }
+},
 
     exportarRelatorioPacientes() {
         const dados = Utilitarios.armazenamento.obter('sml_pacientes', []);
@@ -2256,6 +2365,7 @@ const ModuloAdmin = {
         
         alert(`Relatório ${nomeArquivo} exportado com sucesso!`);
     }
+    
 };
 
 // =============================================
@@ -2300,6 +2410,8 @@ const ModuloSecretaria = {
         } else if (aba === 'sec-agendamentos') {
             ModuloAgendamentos.inicializar("agendamentos-secretaria-container");
             this.renderizarAgendamentosSecretaria();
+        } else if (aba === 'sec-financeiro') {
+            this.inicializarFinanceiro();
         } else if (aba === 'sec-dashboard') {
             this.renderizarDashboard();
         }
@@ -2313,6 +2425,203 @@ const ModuloSecretaria = {
                 ModuloPacientes.salvarPaciente();
             });
         }
+
+        // Configurar eventos do financeiro
+        this.configurarEventosFinanceiro();
+    },
+
+    configurarEventosFinanceiro() {
+        // Evento para mostrar/ocultar campo de parcelas
+        Utilitarios.seletor("#formaPagamento").addEventListener("change", function() {
+            const grupoParcelas = Utilitarios.seletor("#grupoParcelas");
+            if (this.value === 'Parcelado') {
+                grupoParcelas.style.display = 'block';
+            } else {
+                grupoParcelas.style.display = 'none';
+            }
+        });
+
+        // Evento para registrar pagamento
+        Utilitarios.seletor("#btnRegistrarPagamento").addEventListener("click", () => {
+            this.registrarPagamento();
+        });
+    },
+
+    inicializarFinanceiro() {
+        this.inicializarDadosFinanceiro();
+        this.renderizarAtendimentosParaPagamento();
+        this.atualizarResumoFinanceiro();
+    },
+
+    inicializarDadosFinanceiro() {
+        // Inicializar dados de pagamentos se não existirem
+        if (!Utilitarios.armazenamento.obter('sml_pagamentos', null)) {
+            Utilitarios.armazenamento.definir('sml_pagamentos', []);
+        }
+
+        // Inicializar dados de atendimentos pagos se não existirem
+        if (!Utilitarios.armazenamento.obter('sml_atendimentos_pagos', null)) {
+            Utilitarios.armazenamento.definir('sml_atendimentos_pagos', []);
+        }
+    },
+
+    renderizarAtendimentosParaPagamento() {
+        const agendamentos = Utilitarios.armazenamento.obter('sml_agendamentos', []);
+        const atendimentosPagos = Utilitarios.armazenamento.obter('sml_atendimentos_pagos', []);
+        
+        const tbody = Utilitarios.seletor("#tabelaAtendimentosSec tbody");
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        // Filtrar apenas agendamentos que ainda não foram pagos
+        const agendamentosNaoPagos = agendamentos.filter(agendamento => {
+            return !atendimentosPagos.some(pago => pago.agendamentoId === agendamento.id);
+        });
+        
+        if (agendamentosNaoPagos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;" class="texto-secundario">Nenhum atendimento pendente de pagamento.</td></tr>';
+        } else {
+            agendamentosNaoPagos.forEach(agendamento => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${Utilitarios.formatarData(agendamento.data)}</td>
+                    <td>${agendamento.hora}</td>
+                    <td>${agendamento.pacienteNome}</td>
+                    <td>${agendamento.dentistaNome}</td>
+                    <td>${agendamento.especialidade}</td>
+                    <td><span style="color: #f57c00; font-weight: bold;">Pendente</span></td>
+                    <td>
+                        <button data-id="${agendamento.id}" class="botao-secundario registrarPagamentoBtn">Registrar Pagamento</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Configurar eventos dos botões de registro
+            Utilitarios.seletores('.registrarPagamentoBtn').forEach(botao => {
+                botao.addEventListener('click', (e) => {
+                    const agendamentoId = e.target.dataset.id;
+                    this.abrirModalPagamento(agendamentoId);
+                });
+            });
+        }
+    },
+
+    abrirModalPagamento(agendamentoId) {
+        const agendamentos = Utilitarios.armazenamento.obter('sml_agendamentos', []);
+        const agendamento = agendamentos.find(a => a.id === agendamentoId);
+        
+        if (!agendamento) {
+            alert('Atendimento não encontrado.');
+            return;
+        }
+        
+        // Preencher dados do modal
+        Utilitarios.seletor("#pacientePagamento").textContent = agendamento.pacienteNome;
+        Utilitarios.seletor("#dentistaPagamento").textContent = agendamento.dentistaNome;
+        Utilitarios.seletor("#dataAtendimentoPagamento").textContent = Utilitarios.formatarData(agendamento.data) + ' às ' + agendamento.hora;
+        
+        // Limpar campos
+        Utilitarios.seletor("#valorPagamento").value = '';
+        Utilitarios.seletor("#formaPagamento").value = 'À vista';
+        Utilitarios.seletor("#parcelasPagamento").value = '2';
+        Utilitarios.seletor("#observacaoPagamento").value = '';
+        Utilitarios.seletor("#grupoParcelas").style.display = 'none';
+        
+        // Armazenar ID do agendamento no modal
+        Utilitarios.seletor("#modalPagamento").dataset.agendamentoId = agendamentoId;
+        
+        // Mostrar modal
+        Utilitarios.seletor("#modalPagamento").style.display = "block";
+    },
+
+    registrarPagamento() {
+        const agendamentoId = Utilitarios.seletor("#modalPagamento").dataset.agendamentoId;
+        const valor = parseFloat(Utilitarios.seletor("#valorPagamento").value);
+        const formaPagamento = Utilitarios.seletor("#formaPagamento").value;
+        const parcelas = formaPagamento === 'Parcelado' ? parseInt(Utilitarios.seletor("#parcelasPagamento").value) : 1;
+        const observacoes = Utilitarios.seletor("#observacaoPagamento").value.trim();
+        
+        if (!valor || valor <= 0) {
+            alert('Informe um valor válido para o pagamento.');
+            return;
+        }
+        
+        const agendamentos = Utilitarios.armazenamento.obter('sml_agendamentos', []);
+        const agendamento = agendamentos.find(a => a.id === agendamentoId);
+        
+        if (!agendamento) {
+            alert('Atendimento não encontrado.');
+            return;
+        }
+        
+        // Criar registro de pagamento
+        const pagamento = {
+            id: Utilitarios.gerarId(),
+            agendamentoId: agendamentoId,
+            pacienteId: agendamento.pacienteId,
+            pacienteNome: agendamento.pacienteNome,
+            dentistaNome: agendamento.dentistaNome,
+            especialidade: agendamento.especialidade,
+            dataAtendimento: agendamento.data,
+            valor: valor,
+            formaPagamento: formaPagamento,
+            parcelas: parcelas,
+            observacoes: observacoes,
+            dataPagamento: new Date().toISOString().slice(0, 10),
+            status: 'Pago'
+        };
+        
+        // Adicionar aos pagamentos
+        const pagamentos = Utilitarios.armazenamento.obter('sml_pagamentos', []);
+        pagamentos.push(pagamento);
+        Utilitarios.armazenamento.definir('sml_pagamentos', pagamentos);
+        
+        // Marcar atendimento como pago
+        const atendimentosPagos = Utilitarios.armazenamento.obter('sml_atendimentos_pagos', []);
+        atendimentosPagos.push({
+            agendamentoId: agendamentoId,
+            dataPagamento: new Date().toISOString().slice(0, 10)
+        });
+        Utilitarios.armazenamento.definir('sml_atendimentos_pagos', atendimentosPagos);
+        
+        alert('Pagamento registrado com sucesso!');
+        fecharModalPagamento();
+        
+        // Atualizar interfaces
+        this.renderizarAtendimentosParaPagamento();
+        this.atualizarResumoFinanceiro();
+        
+        // Atualizar dashboard do admin se estiver aberto
+        if (typeof ModuloAdmin !== 'undefined') {
+            ModuloAdmin.renderizarFinanceiro();
+            ModuloAdmin.renderizarDashboard();
+        }
+    },
+
+    atualizarResumoFinanceiro() {
+        const pagamentos = Utilitarios.armazenamento.obter('sml_pagamentos', []);
+        const agendamentos = Utilitarios.armazenamento.obter('sml_agendamentos', []);
+        const atendimentosPagos = Utilitarios.armazenamento.obter('sml_atendimentos_pagos', []);
+        
+        // Calcular total recebido no mês atual
+        const mesAtual = new Date().getMonth();
+        const anoAtual = new Date().getFullYear();
+        
+        const totalRecebido = pagamentos
+            .filter(pagamento => {
+                const dataPagamento = new Date(pagamento.dataPagamento);
+                return dataPagamento.getMonth() === mesAtual && dataPagamento.getFullYear() === anoAtual;
+            })
+            .reduce((total, pagamento) => total + pagamento.valor, 0);
+        
+        // Calcular pagamentos pendentes
+        const pagamentosPendentes = agendamentos.length - atendimentosPagos.length;
+        
+        // Atualizar interface
+        Utilitarios.seletor("#totalRecebidoSecretaria").textContent = Utilitarios.formatarMoeda(totalRecebido);
+        Utilitarios.seletor("#pagamentosPendentes").textContent = pagamentosPendentes;
     },
 
     renderizarDashboard() {
@@ -2343,6 +2652,9 @@ const ModuloSecretaria = {
                 });
             }
         }
+
+        // Atualizar resumo financeiro no dashboard também
+        this.atualizarResumoFinanceiro();
     },
 
     renderizarAgendamentosSecretaria() {
@@ -2512,6 +2824,9 @@ const ModuloDentista = {
 // =============================================
 // FUNÇÕES GLOBAIS
 // =============================================
+function fecharModalPagamento() {
+    Utilitarios.seletor("#modalPagamento").style.display = "none";
+}
 function fecharModalPaciente() {
     Utilitarios.seletor("#modalPaciente").style.display = "none";
 }
